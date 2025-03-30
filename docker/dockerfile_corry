@@ -1,0 +1,63 @@
+FROM ubuntu:20.04
+SHELL ["/bin/bash", "-c"]
+
+#general
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y git && \
+    apt-get install -y vim 
+
+#root
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends binutils cmake dpkg-dev g++ gcc libssl-dev git libx11-dev \
+libxext-dev libxft-dev libxpm-dev python3 libtbb-dev libgif-dev
+
+WORKDIR /src/
+
+RUN git clone https://github.com/root-project/root.git
+WORKDIR /src/root
+RUN git checkout -b v6-24-06 v6-24-06
+
+WORKDIR /src/
+RUN mkdir root_build root_install
+
+WORKDIR /src/root_build
+RUN cmake -DCMAKE_CXX_STANDARD=17 -Dminuit2=ON -DCMAKE_INSTALL_PREFIX=../root_install ../root
+
+RUN cmake --build . -- install -j $(nproc)
+
+RUN source /src/root_install/bin/thisroot.sh
+#RUN export ROOT_DIR=/src/root_install/cmake
+ENV ROOT_DIR=/src/root_install/cmake
+
+#python
+RUN apt-get install -y python3-pip
+RUN pip3 install numpy pandas
+
+#eudaq
+WORKDIR /src/
+RUN git clone https://github.com/bpilsl/eudaq
+WORKDIR /src/eudaq/
+RUN git checkout monopix2
+
+WORKDIR /src/eudaq/build
+RUN cmake -D PYTHON_EXECUTABLE=`which python` -D EUDAQ_BUILD_PYTHON=ON -D USER_MONOPIX2_BUILD=ON ..
+RUN make -j $(nproc)
+RUN make install
+ENV eudaq_DIR=/src/eudaq/cmake
+
+#corryvreckan
+WORKDIR /src/
+RUN git clone https://gitlab.cern.ch/corryvreckan/corryvreckan.git
+
+WORKDIR /src/corryvreckan/build/
+RUN export eudaq_DIR=/src/eudaq/
+RUN apt-get install -y libeigen3-dev
+RUN cmake -D PYTHON_EXECUTABLE=`which python` -D EUDAQ_BUILD_PYTHON=ON -D USER_MONOPIX2_BUILD=ON -D BUILD_EventLoaderEUDAQ2=ON -DEUDAQ_BUILD_STDEVENT_MONITOR=ON ..
+RUN make -j $(nproc)
+RUN make install
+ENV PATH="$PATH:/src/corryvreckan/bin/"
+
+WORKDIR /
+RUN printf "source /src/root_install/bin/thisroot.sh\n/bin/bash" > startup.sh
+ENTRYPOINT source startup.sh
+
