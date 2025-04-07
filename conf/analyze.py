@@ -1,94 +1,96 @@
-'''
-Usage: python3 analyze.py --start 1400 --stop 1568
-'''
-
-import argparse
-import glob
 import re
 import os
-import pandas as pd
+import sys
+import argparse
+from glob import glob
 
+def runCorry(config, files, log, additional=None):
+    """
+    Function to execute the Corry software with the given parameters.
+    Args:
+        config: The configuration file to use.
+        files: A list of files required by the Corry program.
+        log: Log file where the output will be saved.
+        additional: Optional string with additional arguments to pass to the Corry program.
+    """
+    cmd = f'./corry -c {config} -o EventLoaderEUDAQ2.file_name={files[0]} -o EventLoaderEUDAQ2:TLU_0.file_name={files[1]} -o EventLoaderHDF5.filename={files[2]} -l {log} -o EventLoaderMuPixTelescope.input_file={files[3]} -l {log} '
+    if additional:
+        cmd += additional
+    print(cmd)  
+    os.system(cmd)
 
-# These paths might need to be changed
-data_folder = '/home/bgnet2/s3_cloud/beam_data/desy'
-corry_bin = '~/corryvreckan/bin/corry'
+def main():
+    # Set up argument parsing
+    parser = argparse.ArgumentParser(description='Run Corry software with specified configurations and data files.')
+    
+    # Define the arguments the script expects
+    parser.add_argument('runs', type=str, help='Run number or range of run numbers (e.g., "1", or "1-5").')
+    parser.add_argument('geo', type=str, help='Path to the geometry file to use.')
+    parser.add_argument('config', type=str, nargs='?', default='analysis.conf', help='Configuration file to use (default: analysis.conf).')
 
-# These paths do not need to be changed.
-geo_path_tel = '../geo/full_aligned'
-dut_align_conf = '../conf/align_dut_mpx2.conf'
-analysis_conf = '../conf/analysis.conf'
-run_align_folder = '../geo/run_align'
-analysis_folder = '../analysis'
+    # Parse the arguments
+    args = parser.parse_args()
 
-do_align_per_run = True
-do_analysis = True
-number_of_events_align = 100000
+    runs = args.runs
+    geo = args.geo
+    config = args.config
 
-parser = argparse.ArgumentParser(description='corry analysis wrapper')
-parser.add_argument('-r', help='run number', default = 0, type=int)
-parser.add_argument('--start', help='run number start', default = 0, type=int)
-parser.add_argument('--stop', help='run number stop', default = 0, type=int)
-parser.add_argument('-n', help='number of events for analysis', default = 100000000, type=int)
+    # Directory paths where the data is stored
+    telDir = 'data/telescope'
+    tluDir = 'data/tlu'
+    dutDir = 'data/dut'
 
-args = parser.parse_args()
+    # List of directories to glob for the files
+    dirs = [telDir, tluDir]
 
-number_of_events_analyze = args.n
+    # Default first and last run number
+    first = last = 0
 
-if args.r == 0 and (args.start == 0 or args.stop == 0):
-    print("Either use run number or start/stop to give a range of runs to be analyzed.")
+    # If a range is provided, split it into first and last
+    if '-' in runs:
+        splitted = runs.split('-')
+        first = int(splitted[0])
+        last = int(splitted[1])
+    else:
+        first = last = int(runs)
 
-if args.r != 0:
-    run_start = args.r
-    run_stop = args.r
-else:
-    run_start = args.start
-    run_stop = args.stop
+    # Loop through the range of runs
+    for runNmb in range(first, last + 1):
 
-df = pd.read_csv("../run_properties.csv", sep=",")
-data_in_files = glob.glob(data_folder + '/*.raw')
+        os.system(f'python ../geo/find_masked_pixel_analysis.py {runNmb}')
+        mask_file = f'../mask_files/run{str(runNmb).zfill(6)}_masked_pixels.txt'
+        files = []
 
-for current_run in range(run_start,run_stop+1):
-    if not current_run in df['run_number'].unique():
-        continue
-    current_dut_file = ''
-    current_tel_file = ''
-    for f in data_in_files:
-        m = re.search(f'mpx2.+run(0*{current_run})', f)
-        if m:
-            current_dut_file = f
+        # Globbing for telescope and TLU data files based on the run number
+        for d in dirs:
+            print(f'Globbing for files in {d} with run number {runNmb:06}')
+            files_found = glob(f'{d}/*run{runNmb:06}*.raw')
+            if files_found:
+                files.append(files_found[0])  # Append the first matched file
+            else:
+                print(f"No files found for run {runNmb:06} in {d}")
+                sys.exit(1)  # Exit if no matching files are found
 
-        m = re.search(f'telescope.+run(0*{current_run})', f)
-        if m:
-            current_tel_file = f
-    if current_dut_file == '' or current_tel_file == '':
-        print(f'raw_files empty for run {current_run}')
-        continue
-    print(f'processing tel: {current_tel_file}, dut: {current_dut_file}')
-    geo_id = df.loc[df['run_number'] == current_run]['geoid'].values[0]
-    tel_full_aligned = geo_path_tel+'/'+f'geo_id{geo_id}_full_aligned.geo'
-    run_aligned = run_align_folder+'/'+f'alignment_run_{current_run}.geo'
-    run_aligned_histo = '/'+f'alignment_run_{current_run}.root'
-    analysis_histo = analysis_folder+'/'+f'analysis_run_{current_run}.root'
+        # Globbing for the DUT file
+        print(f'Globbing for DUT file with run number {runNmb:06}')
+        dut_file_found = glob(f'data/dut/module_0/chip_0/run{runNmb:06}_converted.h5')
+        if dut_file_found:
+            files.append(dut_file_found[0])  # Append the first matched DUT file
+        else:
+            print(f"No DUT file found for run {runNmb:06}")
+            sys.exit(1)
 
-    if do_align_per_run:
-        print(f'Running alignment for run {current_run}')
-        corry_cmd = f'{corry_bin} -c {dut_align_conf} -o number_of_events={number_of_events_align} -o output_directory={run_align_folder} -o detectors_file={tel_full_aligned} -o detectors_file_updated={run_aligned} -o histogram_file={run_aligned_histo} -o EventLoaderEUDAQ2.file_name={current_tel_file} -o EventLoaderEUDAQ2:Monopix2_0.file_name={current_dut_file}'
-        print(corry_cmd)
-        os.system(corry_cmd)
+        # Globbing for the telepix2 block file
+        print(f'Globbing for telepix2 block file for run {runNmb:06}')
+        telepix_file_found = glob(f'data/telepix2/single_run_{runNmb:06}.blck')
+        if telepix_file_found:
+            files.append(os.path.basename(telepix_file_found[0]))  # Append the block file
+        else:
+            print(f"No telepix2 block file found for run {runNmb:06}")
+            sys.exit(1)
 
-        #Add mask file path to run aligned file
-        with open(run_align_folder+'/'+f'alignment_run_{current_run}.geo', "r") as f:
-            contents = f.readlines()
+        # Run Corry with the found files and configuration
+        runCorry(config, files, f'logs/log_ana{runNmb:06}.txt', f'-o histogram_file=analysis_{runNmb:06}.root -o detectors_file={geo} -g Monopix2_0.mask_file={mask_file}')
 
-        index = contents.index('[Monopix2_0]\n')
-        contents.insert(index+1, f'mask_file="../mask_files/applied_masks/mask_run{current_run}.txt"\n')
-
-        with open(run_aligned, "w") as f:
-            contents = "".join(contents)
-            f.write(contents)
-
-    if do_analysis:
-        print(f'Running anaylsis for run {current_run}')
-        corry_cmd = f'{corry_bin} -c {analysis_conf} -o number_of_events={number_of_events_analyze} -o output_directory={analysis_folder} -o detectors_file={run_aligned} -o histogram_file={analysis_histo} -o EventLoaderEUDAQ2.file_name={current_tel_file} -o EventLoaderEUDAQ2:Monopix2_0.file_name={current_dut_file}'
-        print(corry_cmd)
-        os.system(corry_cmd)
+if __name__ == "__main__":
+    main()
