@@ -34,6 +34,8 @@ def main():
     runs = args.runs
     geo = args.geo
     config = args.config
+    geo_dut_aligned = geo[:-4] + "_dut_aligned.geo"
+    geo_dut_pre_aligned = geo[:-4] + "_dut_pre_aligned.geo"
 
     # Directory paths where the data is stored
     telDir = 'data/telescope'
@@ -57,8 +59,9 @@ def main():
     # Loop through the range of runs
     for runNmb in range(first, last + 1):
 
-        os.system(f'python ../geo/find_masked_pixel_analysis.py {runNmb}')
-        mask_file = f'../mask_files/run{str(runNmb).zfill(6)}_masked_pixels.txt'
+        os.system(f'python /media/testbeam1/tb2025c/tb2025d/desy-tb-2025/find_masked_pixel_analysis.py {runNmb}')
+        mask_file = f'/media/testbeam1/tb2025c/tb2025d/desy-tb-2025/data/dut/module_0/chip_0/run{str(runNmb).zfill(6)}_masked_pixels.txt'
+
         files = []
 
         # Globbing for telescope and TLU data files based on the run number
@@ -90,7 +93,9 @@ def main():
             sys.exit(1)
 
         # Run Corry with the found files and configuration
-        runCorry(config, files, f'logs/log_ana{runNmb:06}.txt', f'-o histogram_file=analysis_{runNmb:06}.root -o detectors_file={geo} -g Monopix2_0.mask_file={mask_file}')
+        runCorry("align_dut.conf",files, f'logs/log_dut_align1{runNmb:06}.txt',f'-o histogram_file=dut_align_{runNmb:06}.root -o detectors_file={geo} -o number_of_tracks=50000 -o detectors_file_updated={geo_dut_pre_aligned} -o DUTAssociation.spatial_cut_abs=150um,150um -g Monopix2_0.mask_file={mask_file}')
+        runCorry("align_dut.conf",files, f'logs/log_dut_align2{runNmb:06}.txt',f'-o histogram_file=dut_align_{runNmb:06}.root -o detectors_file={geo_dut_pre_aligned} -o number_of_tracks=75000 -o detectors_file_updated={geo_dut_aligned} -o DUTAssociation.spatial_cut_abs=50um,50um -g Monopix2_0.mask_file={mask_file}')
+        runCorry(config, files, f'logs/log_ana{runNmb:06}.txt', f'-o histogram_file=analysis_{runNmb:06}.root -o detectors_file={geo_dut_aligned} -g Monopix2_0.mask_file={mask_file}')
 
 if __name__ == "__main__":
     main()

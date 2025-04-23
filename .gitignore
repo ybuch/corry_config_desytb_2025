@@ -1,0 +1,10 @@
+*.root
+*.7z
+*.gz
+*.tar
+*.zip
+*.log
+output/
+logs/
+conf/log
+conf/trace

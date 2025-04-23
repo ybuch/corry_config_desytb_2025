@@ -12,8 +12,9 @@ def runCorry(config, files, log, additional=None):
         files: A list of files required by the Corry program.
         log: Log file where the output will be saved.
         additional: Optional string with additional arguments to pass to the Corry program.
-    """
+    # """
     cmd = f'./corry -c {config} -o EventLoaderEUDAQ2.file_name={files[0]} -o EventLoaderEUDAQ2:TLU_0.file_name={files[1]} -o EventLoaderHDF5.filename={files[2]}   -o EventLoaderMuPixTelescope.input_file={files[3]} -l {log} '
+    #cmd = f'./corry -c {config} -o EventLoaderEUDAQ2.file_name={files[0]} -o EventLoaderEUDAQ2:TLU_0.file_name={files[1]} -o EventLoaderHDF5.filename={files[2]} -l {log} '
     if additional:
         cmd += additional
     print('\n\n ####### RUNNING: ', cmd,'\n\n')  
@@ -69,10 +70,10 @@ def main():
     print(f'Globbing for telepix2 block file for run {runNmb:06}')
     telepix_file_found = glob(f'data/telepix2/single_run_{runNmb:06}.blck')
     if telepix_file_found:
-        files.append(os.path.basename(telepix_file_found[0]))  # Append the block file
+       files.append(os.path.basename(telepix_file_found[0]))  # Append the block file
     else:
-        print(f"No telepix2 block file found for run {runNmb:06}")
-        sys.exit(1)
+       print(f"No telepix2 block file found for run {runNmb:06}")
+       sys.exit(1)
 
     # Running the Corry software with different configuration files
     runCorry('prealign.conf', files, 'logs/log_prealign.txt', f'-o detectors_file={initialGeo}')
