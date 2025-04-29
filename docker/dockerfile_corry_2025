@@ -45,14 +45,23 @@ RUN make -j $(nproc)
 RUN make install
 ENV eudaq_DIR=/src/eudaq/cmake
 
+#
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libboost-all-dev libeigen3-dev libhdf5-dev
+ADD /telepixdataformat /src/telepixdataformat
+WORKDIR /src/telepixdataformat/build
+RUN cmake ..
+RUN make -j $(nproc)
+RUN make install
+ENV MUPIX8DAQ=/src/telepixdataformat
+RUN export MUPIX8DAQ=/src/telepixdataformat
+
 #corryvreckan
 WORKDIR /src/
 RUN git clone https://gitlab.cern.ch/corryvreckan/corryvreckan.git
 
 WORKDIR /src/corryvreckan/build/
 RUN export eudaq_DIR=/src/eudaq/
-RUN apt-get install -y libeigen3-dev
-RUN cmake -D PYTHON_EXECUTABLE=`which python` -D EUDAQ_BUILD_PYTHON=ON -D USER_MONOPIX2_BUILD=ON -D BUILD_EventLoaderEUDAQ2=ON -DEUDAQ_BUILD_STDEVENT_MONITOR=ON ..
+RUN cmake -D PYTHON_EXECUTABLE=`which python` -D BUILD_EventLoaderEUDAQ2=ON -D BUILD_EventLoaderHDF5=ON -D BUILD_EventLoaderMuPixTelescop=ON ..
 RUN make -j $(nproc)
 RUN make install
 ENV PATH="$PATH:/src/corryvreckan/bin/"
