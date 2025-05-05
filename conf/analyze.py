@@ -37,10 +37,12 @@ def main():
     geo_dut_aligned = geo[:-4] + "_dut_aligned.geo"
     geo_dut_pre_aligned = geo[:-4] + "_dut_pre_aligned.geo"
 
+    data_path = '/s3_cloud/TB2025/desy-tb-2025'
+
     # Directory paths where the data is stored
-    telDir = '/s3_cloud/TB2025/desy-tb-2025/data/telescope'
-    tluDir = '/s3_cloud/TB2025/desy-tb-2025/data/tlu'
-    dutDir = '/s3_cloud/TB2025/desy-tb-2025/data/dut'
+    telDir = data_path+'/data/telescope'
+    tluDir = data_path+'/data/tlu'
+    dutDir = data_path+'/data/dut'
     mask_file_mimosa26_0 = '/corry_config_desytb_2025/geo/mask_files/mask_MIMOSA26_0.txt'
     mask_file_mimosa26_1 = '/corry_config_desytb_2025/geo/mask_files/mask_MIMOSA26_1.txt'
     mask_file_mimosa26_2 = '/corry_config_desytb_2025/geo/mask_files/mask_MIMOSA26_2.txt'
@@ -66,7 +68,7 @@ def main():
     for runNmb in range(first, last + 1):
 
         #os.system(f'python /s3_cloud/TB2025/desy-tb-2025/find_masked_pixel_analysis.py {runNmb}')
-        mask_file = f'/s3_cloud/TB2025/desy-tb-2025/data/dut/module_0/chip_0/run{str(runNmb).zfill(6)}_masked_pixels.txt'
+        mask_file = data_path+f'/data/dut/module_0/chip_0/run{str(runNmb).zfill(6)}_masked_pixels.txt'
 
         files = []
 
@@ -82,7 +84,7 @@ def main():
 
         # Globbing for the DUT file
         print(f'Globbing for DUT file with run number {runNmb:06}')
-        dut_file_found = glob(f'/s3_cloud/TB2025/desy-tb-2025/data/dut/module_0/chip_0/run{runNmb:06}_converted.h5')
+        dut_file_found = glob(data_path+f'/data/dut/module_0/chip_0/run{runNmb:06}_converted.h5')
         if dut_file_found:
             files.append(dut_file_found[0])  # Append the first matched DUT file
         else:
@@ -91,7 +93,7 @@ def main():
 
         # Globbing for the telepix2 block file
         print(f'Globbing for telepix2 block file for run {runNmb:06}')
-        telepix_file_found = glob(f'/s3_cloud/TB2025/desy-tb-2025/data/telepix2/single_run_{runNmb:06}.blck')
+        telepix_file_found = glob(data_path+f'/data/telepix2/single_run_{runNmb:06}.blck')
         if telepix_file_found:
             files.append(os.path.basename(telepix_file_found[0]))  # Append the block file
         else:
