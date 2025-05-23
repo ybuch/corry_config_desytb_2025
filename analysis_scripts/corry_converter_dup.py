@@ -4,11 +4,15 @@ import numpy as np
 from tjmonopix2.analysis import analysis
 import tables
 from numba import njit
+import argparse
+import re
+import fnmatch
 
-file_name = "/home/mx/Daten/Schule/aktuell/Nosync/tj-monopix2-daq/tjmonopix2/scans/output_data/module_0/chip_0/20240719_210855_eudaq_scan.h5"
+
+file_name = "/media/testbeam1/tb2025c/tb2025d/desy-tb-2025/data/dut/module_0/chip_0/run001685_20250403_023617_ext_trigger_scan.h5"
 
 
-# Author: Maximilian Babeluk
+# Author: Maximilian Babeluk, last modified by Guglielmo Benfratello
 # Quick and dirty converter script to create h5 files to load into corry via the hdf5 loader
 # Only intentended for testing, data duplication similar to what is done in the eudaq producer
 
@@ -18,7 +22,7 @@ file_name = "/home/mx/Daten/Schule/aktuell/Nosync/tj-monopix2-daq/tjmonopix2/sca
 def analyze(file):
     if '_interpreted' in file:
         print('Skipping analysis: already done')
-        return filetrigger_number
+        return file
 
     file_interpreted = file.rsplit(".h5")[0] + "_interpreted.h5"
 
@@ -90,7 +94,11 @@ def process_rows(data, trigger_number, timestamp_first, trigger_extension):
 
 
 def build_table_in_chunks(file, chunk_size=1000000):
-    file_corry = file.rsplit("_interpreted.h5")[0] + "_corry.h5"
+    file_name = file.rsplit("/")[-1]
+    file_name = file_name.rsplit("_")[0] + "_converted.h5"
+    file_corry = file.rsplit("run")[0] + file_name
+    #file_corry = file.rsplit("_interpreted.h5")[0] + "_corry.h5"
+
     if os.path.exists(file_corry):
         os.remove(file_corry)
     destination_file = file_corry
@@ -158,8 +166,64 @@ def build_table_in_chunks(file, chunk_size=1000000):
 
 
 if __name__ == '__main__':
-    res = analyze(file_name)
-    res = build_table_in_chunks(res)
+    parser = argparse.ArgumentParser(description="Convert hit table to be compatible with corryvreckan EventLoaderHDF5.")
+    parser.add_argument("--path", type=str, help="Path to a directory containing input files (HDF5 files).")
+    parser.add_argument("--force", action="store_true", help="Force interpretation and conversion of already existing files.")
+
+    args = parser.parse_args()
+
+    directory = "/media/testbeam1/tb2025c/tb2025d/desy-tb-2025/data/dut/module_0/chip_0/"
+
+    run_re = re.compile(r'run(\d+)_')  # Regular expression to extract run numbers from filenames
+    input_path = directory
+    if args.path:
+        input_path = os.path(args.path)
+
+    pattern = '*ext_trigger_scan.h5'
+
+    # List to store matching filenames
+    raw_files = []
+
+    # Loop through the files in the directory
+    for filename in os.listdir(directory):
+        # Check if it's a file and matches the pattern
+        if os.path.isfile(os.path.join(directory, filename)) and fnmatch.fnmatch(filename, pattern):
+            raw_files.append(filename)
+
+
+    # Collect raw HDF5 files that match the naming pattern
+    raw_dict = {}
+    raw_runs = []
+
+    # print('got ', list(raw_files), '\n\n')    
+    for file in raw_files:     
+        run_number_match = run_re.search(os.path.splitext(os.path.basename(file))[0])
+        if run_number_match:
+            run_number = run_number_match.group(1)
+            raw_dict[run_number] = file
+            raw_runs.append(run_number)
+
+    # Collect interpreted and converted files for comparison
+    converted_pattern = "*_converted.h5"
+    converted_files = []
+    for filename in os.listdir(directory):
+        # Check if it's a file and matches the pattern
+        if os.path.isfile(os.path.join(directory, filename)) and fnmatch.fnmatch(filename, converted_pattern):
+            converted_files.append(filename)
+
+    converted_runs = [run_re.search(os.path.splitext(os.path.basename(file))[0]).group(1) for file in converted_files if run_re.search(os.path.splitext(os.path.basename(file))[0])]
+
+    # Determine raw files that have not yet been converted
+    if not args.force:
+        not_converted_runs = list(set(raw_runs) - set(converted_runs))
+    else:
+        not_converted_runs = list(raw_runs)
+    input_files = [raw_dict[run] for run in not_converted_runs]
+
+    for input_file in input_files:
+        total_file = directory + input_file
+        res = analyze(total_file)
+        res = build_table_in_chunks(res)
 
 
 
