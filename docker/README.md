@@ -40,15 +40,16 @@ This manual assumes that you added docker to your sudo group like is described h
 
 Clone repo
 
-`$ git clone https://github.com/ybuch/corry_config_desytb_2024.git`
+`$ git clone https://github.com/ybuch/corry_config_desytb_2025.git`
 
-`$ cd corry_config_desytb_2024/docker`
+`$ cd corry_config_desytb_2025/docker`
 
-You can pull the image from Docker Hub using `ybuch/belle-ii-tb:2024_2x2inpix_hdf5` in the subsequent calls instead of the name defined by `corry:tb2024` in the previous line. 
+You can pull the image from Docker Hub using `ybuch/belle-ii-tb:2025v5` in the subsequent calls.
+If oyu buil dthe image locally instead you will need to use the name of your local image defined by `corry:tb2025` in the following line. 
 
 Alternatively you can also build the image from source by executing the following line in the folder with dockerfile_corry execute
 
-`$ docker build -t corry:tb2024 -f dockerfile_corry .`
+`$ docker build -t corry:tb2025 -f dockerfile_corry .`
 
 This will take some time as root, eudaq and corry will be built from source.
 
@@ -56,7 +57,7 @@ Choose option with or without graphics:
 
 Option 1: Run container without graphics (use this if you are running on servers):
 
-`$ docker run --name corry_container -i -t --mount type=bind,source=$HOME/corry_config_desytb_2024/,target=/corry_config_desytb_2024 --mount type=bind,source=$HOME/s3_cloud/,target=/s3_cloud,readonly corry:tb2024`
+`$ docker run --name corry_container -i -t --mount type=bind,source=$HOME/corry_config_desytb_2025/,target=/corry_config_desytb_2025 --mount type=bind,source=$HOME/s3_cloud/,target=/s3_cloud,readonly corry:tb2025`
 
 Option 2: Run container with graphics (use this if you want to use root inside the docker container for TBrowser to inspect root files):
 
@@ -64,7 +65,7 @@ Allow docker to connect to X11 socket
 
 `$ xhost +local:docker`
 
-`$ docker run --name corry_container -i -t --mount type=bind,source=/home/bgnet2/corry_config_desytb_2024/,target=/corry_config_desytb_2024 --mount type=bind,source=/home/bgnet2/s3_cloud/,target=/s3_cloud,readonly -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix corry:tb2024`
+`$ docker run --name corry_container -i -t --mount type=bind,source=/home/bgnet2/corry_config_desytb_2025/,target=/corry_config_desytb_2025 --mount type=bind,source=/home/bgnet2/s3_cloud/,target=/s3_cloud,readonly -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix corry:tb2025`
 
 Help in case you need to change the docker run command, e.g. if your setup requires different paths:
 
@@ -88,46 +89,32 @@ Defines the container you want to run. In this case it is the same name you just
 
 Once inside the docker container
 
-`$ vim corry_config_desytb_2024/conf/analyze.py`
+`$ vim corry_config_desytb_2025/conf/analyze.py`
 
-And change **corry_bin** path:
+And change **data_path** path:
 
-**corry_bin = '/src/corryvreckan/bin/corry'**
+**data_path = '.'**
 
-and data_folder to the data folder you mounted when running the container:
+And create a link to your data folder using 
 
-**data_folder = '/s3_cloud/beam_data/desy'**
+`$ ln -s /path/to/data data/`.
 
-`$ vim corry_config_desytb_2024/conf/full_align.sh`
+Similarly, create a link to the corry binary 
 
-**RAW_DIR="/s3_cloud/beam_data/desy"**
+`$ ln -s /path/to/corryvreckan/bin/corry corry`.
 
-## Do the analysis
+If you decide to do so then change
 
-Start alignment by ./full_align.sh run_number geo_id
+**cmd = './corry ...'**
 
-`$ cd corry_config_desytb_2024/conf/`
+or if you have it in $PATH you can use
 
-`$ chmod +x full_align.sh`
+**cmd = 'corry ...'**
 
-`$ ./full_align.sh run_number geo_id`
+And change **repo_path** path:
 
-Example: `$ ./full_align.sh 1535 7`
+**repo_path = '/corry_config_desytb_2025'**
 
-Start analysis with
+to the root of this git repo.
 
-`$ cd corry_config_desytb_2024/conf/`
 
-`$ python3 analyze.py --start 1535 --stop 1535`
-
-Analysis files (as well as any output files for that matter) are to be found in the mounted analysis git repository. Analysis files can be found in /analysis 
-
-Inspecting analysis files can be done with a root TBrowser from either the host system or, if configured during the startup of the docker container, with the root version inside docker. 
-
-`$ cd corry_config_desytb_2024/analysis`
-
-`$ root`
-
-`$ new TBrowser`
-
-Select respective analysis file for a specific run and browse through the available hitmaps/histograms/plots 
