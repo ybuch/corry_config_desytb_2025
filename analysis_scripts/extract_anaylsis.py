@@ -79,12 +79,12 @@ if __name__ == '__main__':
     print(run_start, run_stop)
     data_in_files = glob.glob(rootfile_folder + '/*.root')
     #print(data_in_files)
-    
+    #analysis_001943.root
     rows_list = []
     for current_run in range(int(run_start),int(run_stop)+1):
         current_root_file = ''
         for f in data_in_files:
-            m = re.search(f'analysis.+run_(0*{current_run})', f)
+            m = re.search(f'analysis.+(0*{current_run})', f)
             if m:
                 current_root_file = f
         if current_root_file == '':
@@ -92,7 +92,7 @@ if __name__ == '__main__':
             continue
 
         run_number = current_run
-
+        print(run_number, current_root_file)
         # Step 1: Load the .root file
         file = ROOT.TFile(current_root_file)
 
@@ -101,19 +101,27 @@ if __name__ == '__main__':
         analysis_dut_dir_res = file.Get("AnalysisDUT/Monopix2_0/global_residuals")
 
         # Step 3: Retrieve the hCutHisto histogram
-        hCutHisto = analysis_dut_dir.Get("hCutHisto")
-        hResX = analysis_dut_dir_res.Get("residualsX")
-        hResY = analysis_dut_dir_res.Get("residualsY")
+        try:
+            hCutHisto = analysis_dut_dir.Get("hCutHisto")
+            hResX = analysis_dut_dir_res.Get("residualsX")
+            hResY = analysis_dut_dir_res.Get("residualsY")
 
-        hResX_tel = [file.Get(f"AnalysisTelescope/MIMOSA26_{nmb}/residualX_global") for nmb in range(0,6)]
-        hResY_tel = [file.Get(f"AnalysisTelescope/MIMOSA26_{nmb}/residualY_global") for nmb in range(0,6)]
+            hResX_tel = [file.Get(f"AnalysisTelescope/MIMOSA26_{nmb}/residualX_global") for nmb in range(0,6)]
+            hResY_tel = [file.Get(f"AnalysisTelescope/MIMOSA26_{nmb}/residualY_global") for nmb in range(0,6)]
+        except:
+            print("skipped",run_number)
+            continue
 
 
         # Retrieve cluster properties
 
-        cluster_size_mean = file.Get("ClusteringSpatial/Monopix2_0/clusterSize").GetMean()
-        cluster_charge_mean = file.Get("ClusteringSpatial/Monopix2_0/clusterCharge").GetMean()
-        seed_charge_mean = file.Get("ClusteringSpatial/Monopix2_0/clusterSeedCharge").GetMean()
+        try:
+            cluster_size_mean = file.Get("Clustering4D/Monopix2_0/clusterSize").GetMean()
+        except:
+            print("skipped",run_number)
+            continue
+        cluster_charge_mean = file.Get("Clustering4D/Monopix2_0/clusterCharge").GetMean()
+        seed_charge_mean = file.Get("Clustering4D/Monopix2_0/clusterSeedCharge").GetMean()
 
         row_dict = {'clusterSize_mean':cluster_size_mean,
                     'clusterCharge_mean':cluster_charge_mean,
@@ -157,12 +165,19 @@ if __name__ == '__main__':
                          })
 
         # resolution calculation Tel
-        tel_resolutions_x = [list(optimise_hist_gaus(hResX)) for hResX in hResX_tel]
-        tel_resolutions_y = [list(optimise_hist_gaus(hResY)) for hResY in hResY_tel]
+        #tel_resolutions_x = [list(optimise_hist_gaus(hResX)) for hResX in hResX_tel]
+        #tel_resolutions_y = [list(optimise_hist_gaus(hResY)) for hResY in hResY_tel]
+        #mean_tel = [telx[0]+tely[0]/2 for telx,tely in zip(tel_resolutions_x,tel_resolutions_y)]
+        #sigma_tel = [telx[1]+tely[1]/2 for telx,tely in zip(tel_resolutions_x,tel_resolutions_y)]
+        #errmean_tel = [telx[2]+tely[2]/2 for telx,tely in zip(tel_resolutions_x,tel_resolutions_y)]
+        #errsigma_tel = [telx[3]+tely[3]/2 for telx,tely in zip(tel_resolutions_x,tel_resolutions_y)]
+        tel_resolutions_x = [list([0,0,0,0]) for hResX in hResX_tel]
+        tel_resolutions_y = [list([0,0,0,0]) for hResY in hResY_tel]        
         mean_tel = [telx[0]+tely[0]/2 for telx,tely in zip(tel_resolutions_x,tel_resolutions_y)]
         sigma_tel = [telx[1]+tely[1]/2 for telx,tely in zip(tel_resolutions_x,tel_resolutions_y)]
         errmean_tel = [telx[2]+tely[2]/2 for telx,tely in zip(tel_resolutions_x,tel_resolutions_y)]
         errsigma_tel = [telx[3]+tely[3]/2 for telx,tely in zip(tel_resolutions_x,tel_resolutions_y)]
+
         di_list = [{f'residuals_mean_mimosa{nmb}':mean_tel[nmb], f'residuals_errmean_mimosa{nmb}':errmean_tel[nmb],f'residuals_sigma_mimosa{nmb}':sigma_tel[nmb],f'residuals_errsigma_mimosa{nmb}':errsigma_tel[nmb]} for nmb in range(0,6)]
         for di in di_list:
             row_dict.update(di)
@@ -191,6 +206,6 @@ if __name__ == '__main__':
 
     df = pd.DataFrame(rows_list,columns=columns)
     df = df.set_index('run_number')
-    df_prop = pd.read_csv(args.run_prop_file).set_index('run_number')
-    df = df.join(df_prop)
+    #df_prop = pd.read_csv(args.run_prop_file).set_index('run_number')
+    #df = df.join(df_prop)
     df.to_csv("analysis_results.csv", sep=',')
