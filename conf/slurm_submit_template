@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=tets_run_2166
+#SBATCH --job-name=<jobname>
 #SBATCH --mail-type=all
 #SBATCH -p scc-cpu
 #SBATCH --output=./slurm_files/slurm-%x-%j.out
@@ -15,4 +15,4 @@ echo "Home directory: ${HOME}"
 echo "Working directory: $PWD"
 echo "Current node: ${SLURM_NODELIST}"
 
-apptainer exec --bind /mnt/ceph-hdd/projects/scc_ugoe_upfb_frey/:/mnt ../docker/belle-ii-tb_2025v5.sif bash -c "source /src/root_install/bin/thisroot.sh; python3 analyze_container.py 2166 /user/buch10/u14336/corry_config_desytb_2025/geo/updated_geo/geo_id12_align_tel_it4.geo"
+apptainer exec --bind /mnt/ceph-hdd/projects/scc_ugoe_upfb_frey/:/mnt ../docker/belle-ii-tb_2025v5.sif bash -c "source /src/root_install/bin/thisroot.sh; python3 analyze_container.py <runnumber> <geopath>"
