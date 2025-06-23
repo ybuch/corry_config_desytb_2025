@@ -15,4 +15,4 @@ echo "Home directory: ${HOME}"
 echo "Working directory: $PWD"
 echo "Current node: ${SLURM_NODELIST}"
 
-apptainer exec --bind /mnt/ceph-hdd/projects/scc_ugoe_upfb_frey/:/mnt ../docker/belle-ii-tb_2025v5.sif bash -c "source /src/root_install/bin/thisroot.sh; python3 analyze_container.py <runnumber> <geopath>"
+apptainer exec --bind /mnt/ceph-hdd/projects/scc_ugoe_upfb_frey/:/mnt ../docker/belle-ii-tb_2025v5.sif bash -c "source /src/root_install/bin/thisroot.sh; python3 analyze_container.py <runnumber> <geopath> <config>"
