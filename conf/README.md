@@ -55,3 +55,27 @@ to the root of this git repo.
 Run with 
 
 `$ python3 analyze.py 1000-1200 ../geo/updated_geo/geo_idXX_align_tel_it4.geo`
+
+
+## Running on cluster via Apptainer
+
+`$ module load apptainer`
+
+`$ apptainer pull docker://ybuch/belle-ii-tb:2025v5`
+
+To get into shell 
+
+`$ apptainer shell belle-ii-tb_2025v5.sif`
+
+One liner to start 
+
+`$ apptainer exec ../docker/belle-ii-tb_2025v4.sif bash -c "source /src/root_install/bin/thisroot.sh; python3 analyze_container.py 2166 /user/buch10/u14336/corry_config_desytb_2025/geo/updated_geo/geo_id12_align_tel_it4.geo`
+
+Then submit the job using 
+
+`$ sbatch slurm_submit`
+
+and view the job using 
+
+`$ squeue --me`
+
