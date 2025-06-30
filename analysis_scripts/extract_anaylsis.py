@@ -152,16 +152,22 @@ if __name__ == '__main__':
         # resolution calculation DUT
         meanx, sigmax, errmeanx, errsigmax = optimise_hist_gaus(hResX)
         meany, sigmay, errmeany, errsigmay = optimise_hist_gaus(hResY)
-        mean=(meanx+meany)/2.0
-        sigma=(sigmax+sigmax)/2.0
-        errmean=(errmeanx+errmeanx)/2.0
-        errsigma=(errsigmax+errsigmax)/2.0
+
+        mean=np.sqrt(meanx**2+meany**2)
+        sigma=(sigmax+sigmay)/2.0
+        #errmean=(errmeanx+errmeany)/2.0
+        #errsigma=(errsigmax+errsigmay)/2.0
         # print(meanx, sigmax, errmeanx, errsigmax)
 
-        row_dict.update({'residuals_mean':mean,
-                         'residuals_errmean':errmean,
+        row_dict.update({
+                         'residuals_mean':mean,
+                         #'residuals_errmean':errmean,
                          'residuals_sigma':sigma,
-                         'residuals_errsigma':errsigma
+                         #'residuals_errsigma':errsigma,
+                         'residuals_meanx':meanx,
+                         'residuals_sigmax':sigmax,
+                         'residuals_meany':meany,
+                         'residuals_sigmay':sigmay,
                          })
 
         # resolution calculation Tel
@@ -194,9 +200,13 @@ if __name__ == '__main__':
                'efficiency_lerr',
                'efficiency_uerr',
                'residuals_mean',
-               'residuals_errmean',
+               #'residuals_errmean',
                'residuals_sigma',
-               'residuals_errsigma',
+               'residuals_meanx',
+               'residuals_sigmax',
+               'residuals_meany',
+               'residuals_sigmay',
+               #'residuals_errsigma',
                'clusterSize_mean',
                'clusterCharge_mean',
                'seedCharge_mean',
