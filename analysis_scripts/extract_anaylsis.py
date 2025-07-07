@@ -216,6 +216,7 @@ if __name__ == '__main__':
 
     df = pd.DataFrame(rows_list,columns=columns)
     df = df.set_index('run_number')
+    df = df[df['nTrackPass']>10000]
     #df_prop = pd.read_csv(args.run_prop_file).set_index('run_number')
     #df = df.join(df_prop)
     df.to_csv("analysis_results.csv", sep=',')
