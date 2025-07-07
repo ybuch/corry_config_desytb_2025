@@ -37,8 +37,6 @@ def main():
     config_dut_align = 'align_dut.conf'
     if 'eudet' in config:
         config_dut_align = 'align_dut_eudet.conf'
-    geo_dut_aligned = geo[:-4] + f"_dut_aligned.geo"
-    geo_dut_pre_aligned = geo[:-4] + f"_dut_pre_aligned_{}.geo"
 
     data_path = '.'
     repo_path="/home/testbeam1/corry_config_desytb_2025"
