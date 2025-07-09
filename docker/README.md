@@ -47,7 +47,7 @@ Clone repo
 You can pull the image from Docker Hub using `ybuch/belle-ii-tb:2025v5` in the subsequent calls.
 If oyu buil dthe image locally instead you will need to use the name of your local image defined by `corry:tb2025` in the following line. 
 
-Alternatively you can also build the image from source by executing the following line in the folder with dockerfile_corry execute
+Alternatively you can also build the image from source by executing the following line in the folder with dockerfile_corry, however you need a folder with the telepix dataformat that is currently not publicly available and has too be there locally, but I am hesitant to upload other peoples code here, (if you plan to compile the container yourself please ask me for the appropriate files), execute
 
 `$ docker build -t corry:tb2025 -f dockerfile_corry .`
 
