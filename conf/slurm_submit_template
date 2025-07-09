@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#SBATCH --job-name=<jobname>
+#SBATCH --mail-type=all
+#SBATCH -p scc-cpu
+#SBATCH --output=./slurm_files/slurm-%x-%j.out
+#SBATCH --error=./slurm_files/slurm-%x-%j.err
+#SBATCH --mem-per-cpu=4G
+
+module load miniforge3
+conda activate corry
+module load apptainer
+
+echo "Submitting job with sbatch from directory: ${SLURM_SUBMIT_DIR}"
+echo "Home directory: ${HOME}"
+echo "Working directory: $PWD"
+echo "Current node: ${SLURM_NODELIST}"
+
+apptainer exec --bind /mnt/ceph-hdd/projects/scc_ugoe_upfb_frey/:/mnt ../docker/belle-ii-tb_2025v5.sif bash -c "source /src/root_install/bin/thisroot.sh; python3 analyze_container.py <runnumber> <geopath> <config>"
