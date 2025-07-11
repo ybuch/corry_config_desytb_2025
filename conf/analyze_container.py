@@ -36,7 +36,10 @@ def main():
     runs = args.runs
     geo = args.geo
     config = args.config
-
+    config_dut_align = 'align_dut.conf'
+    if 'eudet' in config:
+        config_dut_align = 'align_dut_eudet.conf'
+    
     data_path = '.'
     repo_path="/user/buch10/u14336/corry_config_desytb_2025"
 
@@ -107,7 +110,7 @@ def main():
 
         # Run Corry with the found files and configuration
         #runCorry("align_dut.conf",files, f'{repo_path}/conf/logs/log_dut_align2{runNmb:06}.txt',f'-o histogram_file=dut_align_{runNmb:06}.root -o detectors_file={geo_dut_pre_aligned} -o number_of_tracks=75000 -o detectors_file_updated={geo_dut_aligned} -o DUTAssociation.spatial_cut_abs=50um,50um -g Monopix2_0.mask_file={mask_file} -g MIMOSA26_0.mask_file={mask_file_mimosa26_0} -g MIMOSA26_1.mask_file={mask_file_mimosa26_1} -g MIMOSA26_2.mask_file={mask_file_mimosa26_2} -g MIMOSA26_3.mask_file={mask_file_mimosa26_3} -g MIMOSA26_4.mask_file={mask_file_mimosa26_4} -g MIMOSA26_5.mask_file={mask_file_mimosa26_5}')
-        runCorry("align_dut.conf",files, f'{repo_path}/conf/logs/log_dut_align1{runNmb:06}.txt',f'-o histogram_file=dut_align_{runNmb:06}.root -o detectors_file={geo} -o number_of_tracks=50000 -o detectors_file_updated={geo_dut_pre_aligned} -o DUTAssociation.spatial_cut_abs=150um,150um -g Monopix2_0.mask_file={mask_file} -g MIMOSA26_0.mask_file={mask_file_mimosa26_0} -g MIMOSA26_1.mask_file={mask_file_mimosa26_1} -g MIMOSA26_2.mask_file={mask_file_mimosa26_2} -g MIMOSA26_3.mask_file={mask_file_mimosa26_3} -g MIMOSA26_4.mask_file={mask_file_mimosa26_4} -g MIMOSA26_5.mask_file={mask_file_mimosa26_5}')
+        runCorry(f"{config_dut_align}",files, f'{repo_path}/conf/logs/log_dut_align1{runNmb:06}.txt',f'-o histogram_file=dut_align_{runNmb:06}.root -o detectors_file={geo} -o number_of_tracks=50000 -o detectors_file_updated={geo_dut_pre_aligned} -o DUTAssociation.spatial_cut_abs=150um,150um -g Monopix2_0.mask_file={mask_file} -g MIMOSA26_0.mask_file={mask_file_mimosa26_0} -g MIMOSA26_1.mask_file={mask_file_mimosa26_1} -g MIMOSA26_2.mask_file={mask_file_mimosa26_2} -g MIMOSA26_3.mask_file={mask_file_mimosa26_3} -g MIMOSA26_4.mask_file={mask_file_mimosa26_4} -g MIMOSA26_5.mask_file={mask_file_mimosa26_5}')
         runCorry(config, files, f'{repo_path}/conf/logs/log_ana{runNmb:06}.txt', f'-o histogram_file=analysis_{runNmb:06}.root -o detectors_file={geo_dut_pre_aligned} -g Monopix2_0.mask_file={mask_file} -g MIMOSA26_0.mask_file={mask_file_mimosa26_0} -g MIMOSA26_1.mask_file={mask_file_mimosa26_1} -g MIMOSA26_2.mask_file={mask_file_mimosa26_2} -g MIMOSA26_3.mask_file={mask_file_mimosa26_3} -g MIMOSA26_4.mask_file={mask_file_mimosa26_4} -g MIMOSA26_5.mask_file={mask_file_mimosa26_5}')
 
 if __name__ == "__main__":
