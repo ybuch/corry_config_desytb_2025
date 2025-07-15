@@ -98,7 +98,9 @@ with open(folder_path + f"/run00{run_no}_masked_pixels.txt", 'w') as file:
 
     file.write(f'c 248\n')
     file.write(f'c 249\n')
-    # file.write(f'r 99\n')
+    if run_no in [1885,1886,1898,1887,1888,1890,1895,1897,1965,2006,2007,2009,2010,2012,2013,2015,2016,2017,2018]:
+        print("found run specific masking")
+        file.write(f'r 99\n')
 
 # # Enumerating only usage -- COMMENT FOR STANDARD USAGE
 # for i in range(np.shape(disabled_pixels)[1]):
