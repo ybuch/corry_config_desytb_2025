@@ -39,7 +39,8 @@ def main():
     config_dut_align = 'align_dut.conf'
     if 'eudet' in config:
         config_dut_align = 'align_dut_eudet.conf'
-    
+    if 'hits' in config:
+        config_dut_align = 'align_dut_eudet_hits.conf'
     data_path = '.'
     repo_path="/user/buch10/u14336/corry_config_desytb_2025"
 
@@ -104,9 +105,13 @@ def main():
         if telepix_file_found:
             files.append(os.path.basename(telepix_file_found[0]))  # Append the block file
         else:
-            print(f"No telepix2 block file found for run {runNmb:06}")
-            #sys.exit(1)
-            continue
+            if runNmb >= 1855 and runNmb <=1865:
+                print(f"no telepix file found for run {runNmb:06}, but ignoring as telepix was not running here.")
+                files.append("dummy")
+            else:
+                print(f"No telepix2 block file found for run {runNmb:06}")
+                #sys.exit(1)
+                continue
 
         # Run Corry with the found files and configuration
         #runCorry("align_dut.conf",files, f'{repo_path}/conf/logs/log_dut_align2{runNmb:06}.txt',f'-o histogram_file=dut_align_{runNmb:06}.root -o detectors_file={geo_dut_pre_aligned} -o number_of_tracks=75000 -o detectors_file_updated={geo_dut_aligned} -o DUTAssociation.spatial_cut_abs=50um,50um -g Monopix2_0.mask_file={mask_file} -g MIMOSA26_0.mask_file={mask_file_mimosa26_0} -g MIMOSA26_1.mask_file={mask_file_mimosa26_1} -g MIMOSA26_2.mask_file={mask_file_mimosa26_2} -g MIMOSA26_3.mask_file={mask_file_mimosa26_3} -g MIMOSA26_4.mask_file={mask_file_mimosa26_4} -g MIMOSA26_5.mask_file={mask_file_mimosa26_5}')
