@@ -69,7 +69,11 @@ To get into shell
 
 One liner to start 
 
-`$ apptainer exec ../docker/belle-ii-tb_2025v4.sif bash -c "source /src/root_install/bin/thisroot.sh; python3 analyze_container.py 2166 /user/buch10/u14336/corry_config_desytb_2025/geo/updated_geo/geo_id12_align_tel_it4.geo`
+`$ apptainer exec ../docker/belle-ii-tb_2025v4.sif bash -c "source /src/root_install/bin/thisroot.sh; python3 analyze_container.py 2166 /user/buch10/u14336/corry_config_desytb_2025/geo/updated_geo/geo_id12_align_tel_it4.geo"`
+
+If the data is not in your home path you may need to mount it via adding --bind
+
+`$ apptainer exec --bind /mnt/ceph-hdd/projects/scc_ugoe_upfb_frey/:/mnt ../docker/belle-ii-tb_2025v4.sif bash -c "source /src/root_install/bin/thisroot.sh; python3 analyze_container.py 2166 /user/buch10/u14336/corry_config_desytb_2025/geo/updated_geo/geo_id12_align_tel_it4.geo"`
 
 Then submit the job using 
 
