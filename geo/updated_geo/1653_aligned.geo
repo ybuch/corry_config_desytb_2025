@@ -1,6 +1,6 @@
 [MIMOSA26_0]
 coordinates = "cartesian"
-mask_file = "/home/testbeam1/corry_config_desytb_2025/geo/mask_files/mask_MIMOSA26_0.txt"
+mask_file = "/user/buch10/u14336/corry_config_desytb_2025/geo/mask_files/mask_MIMOSA26_0.txt"
 material_budget = 0.00075
 number_of_pixels = 1152, 576
 orientation = 0.103419deg,0.0225172deg,0.236746deg
@@ -13,7 +13,7 @@ type = "mimosa26"
 
 [MIMOSA26_1]
 coordinates = "cartesian"
-mask_file = "/home/testbeam1/corry_config_desytb_2025/geo/mask_files/mask_MIMOSA26_1.txt"
+mask_file = "/user/buch10/u14336/corry_config_desytb_2025/geo/mask_files/mask_MIMOSA26_1.txt"
 material_budget = 0.00075
 number_of_pixels = 1152, 576
 orientation = 0.100096deg,0.00446907deg,0.261899deg
@@ -26,7 +26,7 @@ type = "mimosa26"
 
 [MIMOSA26_2]
 coordinates = "cartesian"
-mask_file = "/home/testbeam1/corry_config_desytb_2025/geo/mask_files/mask_MIMOSA26_2.txt"
+mask_file = "/user/buch10/u14336/corry_config_desytb_2025/geo/mask_files/mask_MIMOSA26_2.txt"
 material_budget = 0.00075
 number_of_pixels = 1152, 576
 orientation = 0.0688695deg,-0.000687549deg,0.367381deg
@@ -40,7 +40,7 @@ type = "mimosa26"
 
 [Monopix2_0]
 coordinates = "cartesian"
-mask_file = "/home/testbeam1/corry_config_desytb_2025/geo/mask_files/mask_dcc.txt"
+#mask_file = "/home/testbeam1/corry_config_desytb_2025/geo/mask_files/mask_dcc.txt"
 material_budget = 0.0032
 number_of_pixels = 512, 512
 orientation = 0.00830789deg,179.035deg,-89.5281deg
@@ -54,7 +54,7 @@ type = "monopix2"
 
 [MIMOSA26_3]
 coordinates = "cartesian"
-mask_file = "/home/testbeam1/corry_config_desytb_2025/geo/mask_files/mask_MIMOSA26_3.txt"
+mask_file = "/user/buch10/u14336/corry_config_desytb_2025/geo/mask_files/mask_MIMOSA26_3.txt"
 material_budget = 0.00075
 number_of_pixels = 1152, 576
 orientation = 0.0706457deg,-0.0241788deg,-0.0505349deg
@@ -67,7 +67,7 @@ type = "mimosa26"
 
 [MIMOSA26_4]
 coordinates = "cartesian"
-mask_file = "/home/testbeam1/corry_config_desytb_2025/geo/mask_files/mask_MIMOSA26_4.txt"
+mask_file = "/user/buch10/u14336/corry_config_desytb_2025/geo/mask_files/mask_MIMOSA26_4.txt"
 material_budget = 0.00075
 number_of_pixels = 1152, 576
 orientation = 0.0751148deg,-0.0199962deg,-0.520876deg
@@ -80,7 +80,7 @@ type = "mimosa26"
 
 [MIMOSA26_5]
 coordinates = "cartesian"
-mask_file = "/home/testbeam1/corry_config_desytb_2025/geo/mask_files/mask_MIMOSA26_5.txt"
+mask_file = "/user/buch10/u14336/corry_config_desytb_2025/geo/mask_files/mask_MIMOSA26_5.txt"
 material_budget = 0.00075
 number_of_pixels = 1152, 576
 orientation = 0.0741407deg,-0.0151261deg,-0.20913deg

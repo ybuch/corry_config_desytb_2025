@@ -40,13 +40,13 @@ type = "mimosa26"
 
 [Monopix2_0]
 coordinates = "cartesian"
-mask_file = "/media/testbeam1/tb2025c/tb2025d/desy-tb-2025/data/dut/module_0/chip_0/run002093_masked_pixels.txt"
+mask_file = "/media/testbeam1/tb2025c/tb2025d/desy-tb-2025/data/dut/module_0/chip_0/run002094_masked_pixels.txt"
 material_budget = 0.0032
 number_of_pixels = 512, 512
-orientation = -0.260352deg,174.194deg,-90.0674deg
+orientation = -0.272155deg,179.101deg,-90.0447deg
 orientation_mode = "xyz"
 pixel_pitch = 33.04um,33.04um
-position = 302.053um,-3.56604mm,129.501mm
+position = 305.353um,-3.60279mm,129.501mm
 role = "dut"
 spatial_resolution = 9.5um,9.5um
 time_resolution = 230us

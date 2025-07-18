@@ -30,15 +30,17 @@ parser = argparse.ArgumentParser(description="Convert hit table to be compatible
 parser.add_argument("run", type=int, help="Number of run for which the mask file is created.")
 args = parser.parse_args()
 
+repo_path="/user/buch10/u14336/corry_config_desytb_2025"
+
 if args.run:
     run_no = int(args.run)
 # # Standard usage
-folder_path = '/media/testbeam1/tb2025c/tb2025d/desy-tb-2025/data/dut/module_0/chip_0/'
+folder_path = f'{repo_path}/conf/data_docker/dut/module_0/chip_0/'
 # filepath_in = find_latest_file(folder_path, 'noise_occupancy_scan_interpreted.h5')
 
 # # Select the wanted file -- COMMENT FOR STANDARD USAGE
 # filepath_in = f"/home/bellevtx01/tb2025d/desy-tb-2025/data/dut/module_0/chip_0/run*{run_no}_*_ext_trigger_scan.h5"
-filepath_in = f"/media/testbeam1/tb2025c/tb2025d/desy-tb-2025/data/dut/module_0/chip_0/run00{run_no}_*_ext_trigger_scan.h5"
+filepath_in = f"{repo_path}/conf/data_docker/dut/module_0/chip_0/run00{run_no}_*_ext_trigger_scan.h5"
 
 # Expand the wildcard using glob
 files = glob.glob(filepath_in)
@@ -96,7 +98,9 @@ with open(folder_path + f"/run00{run_no}_masked_pixels.txt", 'w') as file:
 
     file.write(f'c 248\n')
     file.write(f'c 249\n')
-    # file.write(f'r 99\n')
+    if run_no in [1885,1886,1898,1887,1888,1890,1895,1897,1965,2006,2007,2009,2010,2012,2013,2015,2016,2017,2018]:
+        print("found run specific masking")
+        file.write(f'r 99\n')
 
 # # Enumerating only usage -- COMMENT FOR STANDARD USAGE
 # for i in range(np.shape(disabled_pixels)[1]):
