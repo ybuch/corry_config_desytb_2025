@@ -33,6 +33,7 @@ def main():
     # Parse the arguments
     args = parser.parse_args()
 
+    charge_cal = True
     runs = args.runs
     geo = args.geo
     config = args.config
@@ -91,7 +92,10 @@ def main():
 
         # Globbing for the DUT file
         print(f'Globbing for DUT file with run number {runNmb:06}')
-        dut_file_found = glob(data_path+f'/data_docker/dut/module_0/chip_0/run{runNmb:06}_converted.h5')
+        if charge_cal:
+            dut_file_found = glob(data_path+f'/data_docker/dut/module_0/charge_calibrated/run{runNmb:06}_*_interpreted_converted.h5')
+        else:
+            dut_file_found = glob(data_path+f'/data_docker/dut/module_0/chip_0/run{runNmb:06}_converted.h5')
         if dut_file_found:
             files.append(dut_file_found[0])  # Append the first matched DUT file
         else:
