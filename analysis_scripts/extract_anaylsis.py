@@ -128,6 +128,21 @@ if __name__ == '__main__':
                     'seedCharge_mean':seed_charge_mean,
                     }
 
+        #retrieve associated cluster properties
+
+        try:
+            cluster_size_mean_associated = file.Get("AnalysisDUT/Monopix2_0/clusterSizeAssociated").GetMean()
+        except:
+            print("skipped",run_number)
+            continue
+        cluster_charge_mean_associated = file.Get("AnalysisDUT/Monopix2_0/clusterChargeAssociated").GetMean()
+        seed_charge_mean_associated = file.Get("AnalysisDUT/Monopix2_0/clusterSeedChargeAssociated").GetMean()
+
+        row_dict = {'clusterSize_mean_associated':cluster_size_mean_associated,
+                    'clusterCharge_mean_associated':cluster_charge_mean_associated,
+                    'seedCharge_mean_associated':seed_charge_mean_associated,
+                    }
+
         # efficiency calculation
         nTrack = int(hCutHisto.GetBinContent(1))
         nTrackCutChi2 = int(hCutHisto.GetBinContent(2))
@@ -210,6 +225,9 @@ if __name__ == '__main__':
                'clusterSize_mean',
                'clusterCharge_mean',
                'seedCharge_mean',
+               'clusterSize_mean_associated',
+               'clusterCharge_mean_associated',
+               'seedCharge_mean_associated',
                ]
     for di in di_list:
         columns  = columns + list(di.keys())
