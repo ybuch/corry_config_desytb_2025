@@ -169,22 +169,16 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Convert hit table to be compatible with corryvreckan EventLoaderHDF5.")
     parser.add_argument("--path", type=str, help="Path to a directory containing input files (HDF5 files).")
     parser.add_argument("--force", action="store_true", help="Force interpretation and conversion of already existing files.")
-    parser.add_argument("--tot_calib_path", type=str, help="Path to a directory containing calibration files.")
+
     args = parser.parse_args()
 
-    #directory = "/media/testbeam1/tb2025c/tb2025d/desy-tb-2025/data/dut/module_0/chip_0/"
-    directory = '/projects/scc/UGOE/UPFB/UPP2/scc_ugoe_upfb_frey/dir.project/tb_data/TB2025/desy-tb-2025/data/dut/module_0/charge_calibrated'
-    calib_directory = '/projects/scc/UGOE/UPFB/UPP2/scc_ugoe_upfb_frey/dir.project/tb_data/TB2025/desy-tb-2025/ToT_TB2025_runs'
-    
+    directory = "/media/testbeam1/tb2025c/tb2025d/desy-tb-2025/data/dut/module_0/chip_0/"
+
     run_re = re.compile(r'run(\d+)_')  # Regular expression to extract run numbers from filenames
     input_path = directory
     if args.path:
         input_path = os.path(args.path)
-    
-    calib_path = calib_directory
-    if args.tot_calib_path:
-        calib_path = os.path(args.tot_calib_path)
-    
+
     pattern = '*ext_trigger_scan.h5'
 
     # List to store matching filenames
@@ -196,14 +190,6 @@ if __name__ == '__main__':
         if os.path.isfile(os.path.join(directory, filename)) and fnmatch.fnmatch(filename, pattern):
             raw_files.append(filename)
 
-    pattern_calib = '*ext_trigger_scan.h5'
-
-    calib_files = []
-    # Loop through the files in the directory
-    for filename in os.listdir(calib_path):
-        # Check if it's a file and matches the pattern
-        if os.path.isfile(os.path.join(calib_path, filename)) and fnmatch.fnmatch(filename, pattern_calib):
-            calib_files.append(filename)
 
     # Collect raw HDF5 files that match the naming pattern
     raw_dict = {}
@@ -217,16 +203,6 @@ if __name__ == '__main__':
             raw_dict[run_number] = file
             raw_runs.append(run_number)
 
-    calib_dict = {}
-    calib_runs = []
-
-    for file in calib_files:     
-        run_number_match = run_re.search(os.path.splitext(os.path.basename(file))[0])
-        if run_number_match:
-            run_number = run_number_match.group(1)
-            calib_dict[run_number] = file
-            calib_runs.append(run_number)
-
     # Collect interpreted and converted files for comparison
     converted_pattern = "*_converted.h5"
     converted_files = []
@@ -236,7 +212,11 @@ if __name__ == '__main__':
             converted_files.append(filename)
 
     converted_runs = [run_re.search(os.path.splitext(os.path.basename(file))[0]).group(1) for file in converted_files if run_re.search(os.path.splitext(os.path.basename(file))[0])]
-
+    print(sorted(raw_runs))
+    print('\n\n\n\n')
+    print(len(raw_runs))
+    print('\n\n\n\n')
+    print(sorted(converted_runs))
     # Determine raw files that have not yet been converted
     if not args.force:
         not_converted_runs = list(set(raw_runs) - set(converted_runs))
